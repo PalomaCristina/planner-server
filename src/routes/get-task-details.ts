@@ -4,20 +4,20 @@ import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import { ClientError } from '../errors/client-error'
 
-export async function getTripDetails(app: FastifyInstance) {
+export async function getTaskDetails(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
-    '/trips/:tripId',
+    '/tasks/:TaskId',
     {
       schema: {
         params: z.object({
-          tripId: z.string().uuid(),
+          TaskId: z.string().uuid(),
         }),
       },
     },
     async (request) => {
-      const { tripId } = request.params
+      const { TaskId } = request.params
 
-      const trip = await prisma.trip.findUnique({
+      const task = await prisma.task.findUnique({
         select: {
           id: true,
           destination: true,
@@ -25,14 +25,14 @@ export async function getTripDetails(app: FastifyInstance) {
           ends_at: true,
           is_confirmed: true,
         },
-        where: { id: tripId },
+        where: { id: TaskId },
       })
 
-      if (!trip) {
-        throw new ClientError('Trip not found')
+      if (!task) {
+        throw new ClientError('Task not found')
       }
 
-      return { trip }
+      return { task }
     },
   )
 }

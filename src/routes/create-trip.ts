@@ -8,9 +8,9 @@ import { dayjs } from '../lib/dayjs'
 import { ClientError } from '../errors/client-error'
 import { env } from '../env'
 
-export async function createTrip(app: FastifyInstance) {
+export async function createTask(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
-    '/trips',
+    '/tasks',
     {
       schema: {
         body: z.object({
@@ -34,14 +34,14 @@ export async function createTrip(app: FastifyInstance) {
       } = request.body
 
       if (dayjs(starts_at).isBefore(new Date())) {
-        throw new ClientError('Invalid trip start date.')
+        throw new ClientError('Invalid task start date.')
       }
 
       if (dayjs(ends_at).isBefore(starts_at)) {
-        throw new ClientError('Invalid trip end date.')
+        throw new ClientError('Invalid task end date.')
       }
 
-      const trip = await prisma.trip.create({
+      const task = await prisma.task.create({
         data: {
           destination,
           starts_at,
@@ -67,7 +67,7 @@ export async function createTrip(app: FastifyInstance) {
       const formattedStartDate = dayjs(starts_at).format('LL')
       const formattedEndDate = dayjs(ends_at).format('LL')
 
-      const confirmationLink = `${env.API_BASE_URL}/trips/${trip.id}/confirm`
+      const confirmationLink = `${env.API_BASE_URL}/tasks/${task.id}/confirm`
 
       const mail = await getMailClient()
 
@@ -98,7 +98,7 @@ export async function createTrip(app: FastifyInstance) {
 
       console.log(nodemailer.getTestMessageUrl(message))
 
-      return { tripId: trip.id }
+      return { taskId: task.id }
     },
   )
 }

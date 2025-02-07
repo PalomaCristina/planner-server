@@ -7,19 +7,19 @@ import { ClientError } from '../errors/client-error'
 
 export async function getActivities(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
-    '/trips/:tripId/activities',
+    '/tasks/:TaskId/activities',
     {
       schema: {
         params: z.object({
-          tripId: z.string().uuid(),
+          TaskId: z.string().uuid(),
         }),
       },
     },
     async (request) => {
-      const { tripId } = request.params
+      const { TaskId } = request.params
 
-      const trip = await prisma.trip.findUnique({
-        where: { id: tripId },
+      const task = await prisma.task.findUnique({
+        where: { id: TaskId },
         include: { 
           activities: {
             orderBy: {
@@ -29,18 +29,18 @@ export async function getActivities(app: FastifyInstance) {
         },
       })
 
-      if (!trip) {
-        throw new ClientError('Trip not found')
+      if (!task) {
+        throw new ClientError('Task not found')
       }
 
-      const differenceInDaysBetweenTripStartAndEnd = dayjs(trip.ends_at).diff(trip.starts_at, 'days')
+      const differenceInDaysBetweenTaskStartAndEnd = dayjs(task.ends_at).diff(task.starts_at, 'days')
 
-      const activities = Array.from({ length: differenceInDaysBetweenTripStartAndEnd + 1 }).map((_, index) => {
-        const date = dayjs(trip.starts_at).add(index, 'days')
+      const activities = Array.from({ length: differenceInDaysBetweenTaskStartAndEnd + 1 }).map((_, index) => {
+        const date = dayjs(task.starts_at).add(index, 'days')
 
         return {
           date: date.toDate(),
-          activities: trip.activities.filter(activity => {
+          activities: task.activities.filter(activity => {
             return dayjs(activity.occurs_at).isSame(date, 'day')
           })
         }

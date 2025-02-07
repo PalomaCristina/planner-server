@@ -10,11 +10,11 @@ import { env } from '../env'
 
 export async function createInvite(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
-    '/trips/:tripId/invites',
+    '/tasks/:TaskId/invites',
     {
       schema: {
         params: z.object({
-          tripId: z.string().uuid(),
+          TaskId: z.string().uuid(),
         }),
         body: z.object({
           email: z.string().email(),
@@ -22,26 +22,26 @@ export async function createInvite(app: FastifyInstance) {
       },
     },
     async (request) => {
-      const { tripId } = request.params
+      const { TaskId } = request.params
       const { email } = request.body
 
-      const trip = await prisma.trip.findUnique({
-        where: { id: tripId }
+      const task = await prisma.task.findUnique({
+        where: { id: TaskId }
       })
 
-      if (!trip) {
-        throw new ClientError('Trip not found')
+      if (!task) {
+        throw new ClientError('Task not found')
       }
 
       const participant = await prisma.participant.create({
         data: {
           email,
-          trip_id: tripId,
+          task_id: TaskId,
         }
       })
 
-      const formattedStartDate = dayjs(trip.starts_at).format('LL')
-      const formattedEndDate = dayjs(trip.ends_at).format('LL')
+      const formattedStartDate = dayjs(task.starts_at).format('LL')
+      const formattedEndDate = dayjs(task.ends_at).format('LL')
 
       const mail = await getMailClient()
 
@@ -53,10 +53,10 @@ export async function createInvite(app: FastifyInstance) {
           address: 'oi@plann.er',
         },
         to: participant.email,
-        subject: `Confirme sua presença na viagem para ${trip.destination} em ${formattedStartDate}`,
+        subject: `Confirme sua presença na viagem para ${task.destination} em ${formattedStartDate}`,
         html: `
         <div style="font-family: sans-serif; font-size: 16px; line-height: 1.6;">
-          <p>Você foi convidado(a) para participar de uma viagem para <strong>${trip.destination}</strong> nas datas de <strong>${formattedStartDate}</strong> até <strong>${formattedEndDate}</strong>.</p>
+          <p>Você foi convidado(a) para participar de uma viagem para <strong>${task.destination}</strong> nas datas de <strong>${formattedStartDate}</strong> até <strong>${formattedEndDate}</strong>.</p>
           <p></p>
           <p>Para confirmar sua presença na viagem, clique no link abaixo:</p>
           <p></p>

@@ -5,6 +5,6 @@ CREATE TABLE "participants" (
     "email" TEXT NOT NULL,
     "is_confirmed" BOOLEAN NOT NULL DEFAULT false,
     "is_owner" BOOLEAN NOT NULL DEFAULT false,
-    "trip_id" TEXT NOT NULL,
-    CONSTRAINT "participants_trip_id_fkey" FOREIGN KEY ("trip_id") REFERENCES "trips" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "task_id" TEXT NOT NULL,
+    CONSTRAINT "participants_Task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "tasks" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );

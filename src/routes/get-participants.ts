@@ -7,19 +7,19 @@ import { ClientError } from '../errors/client-error'
 
 export async function getParticipants(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
-    '/trips/:tripId/participants',
+    '/tasks/:TaskId/participants',
     {
       schema: {
         params: z.object({
-          tripId: z.string().uuid(),
+          TaskId: z.string().uuid(),
         }),
       },
     },
     async (request) => {
-      const { tripId } = request.params
+      const { TaskId } = request.params
 
-      const trip = await prisma.trip.findUnique({
-        where: { id: tripId },
+      const task = await prisma.task.findUnique({
+        where: { id: TaskId },
         include: { 
           participants: {
             select: {
@@ -32,11 +32,11 @@ export async function getParticipants(app: FastifyInstance) {
         },
       })
 
-      if (!trip) {
-        throw new ClientError('Trip not found')
+      if (!task) {
+        throw new ClientError('Task not found')
       }
 
-      return { participants: trip.participants }
+      return { participants: task.participants }
     },
   )
 }

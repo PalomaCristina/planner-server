@@ -6,11 +6,11 @@ import { ClientError } from '../errors/client-error'
 
 export async function createLink(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
-    '/trips/:tripId/links',
+    '/tasks/:TaskId/links',
     {
       schema: {
         params: z.object({
-          tripId: z.string().uuid(),
+          TaskId: z.string().uuid(),
         }),
         body: z.object({
           title: z.string().min(4),
@@ -19,22 +19,22 @@ export async function createLink(app: FastifyInstance) {
       },
     },
     async (request) => {
-      const { tripId } = request.params
+      const { TaskId } = request.params
       const { title, url } = request.body
 
-      const trip = await prisma.trip.findUnique({
-        where: { id: tripId }
+      const task = await prisma.task.findUnique({
+        where: { id: TaskId }
       })
 
-      if (!trip) {
-        throw new ClientError('Trip not found')
+      if (!task) {
+        throw new ClientError('Task not found')
       }
 
       const link = await prisma.link.create({
         data: {
           title,
           url,
-          trip_id: tripId,
+          task_id: TaskId,
         }
       })
 

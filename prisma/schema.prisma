@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Trip {
+model Task {
   id           String   @id @default(uuid())
   destination  String
   starts_at    DateTime
@@ -19,7 +19,7 @@ model Trip {
   activities   Activity[]
   links        Link[]
 
-  @@map("trips")
+  @@map("tasks")
 }
 
 model Participant {
@@ -29,9 +29,8 @@ model Participant {
   email        String
   is_confirmed Boolean @default(false)
   is_owner     Boolean @default(false)
-
-  trip_id String
-  trip    Trip   @relation(fields: [trip_id], references: [id])
+  task_id      String
+  task    Task   @relation(fields: [task_id], references: [id])
 
   @@map("participants")
 }
@@ -40,9 +39,8 @@ model Activity {
   id        String   @id @default(uuid())
   title     String
   occurs_at DateTime
-
-  trip_id String
-  trip    Trip   @relation(fields: [trip_id], references: [id])
+  task_id String
+  task    Task   @relation(fields: [task_id], references: [id])
 
   @@map("activities")
 }
@@ -51,9 +49,8 @@ model Link {
   id    String @id @default(uuid())
   title String
   url   String
-
-  trip_id String
-  trip    Trip   @relation(fields: [trip_id], references: [id])
+  task_id String
+  task    Task   @relation(fields: [task_id], references: [id])
 
   @@map("links")
 }

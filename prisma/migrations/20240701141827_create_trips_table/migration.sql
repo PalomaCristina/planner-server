@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "trips" (
+CREATE TABLE "tasks" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "destination" TEXT NOT NULL,
     "starts_at" DATETIME NOT NULL,

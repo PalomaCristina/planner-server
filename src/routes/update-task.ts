@@ -5,13 +5,13 @@ import { prisma } from '../lib/prisma'
 import { dayjs } from '../lib/dayjs'
 import { ClientError } from '../errors/client-error'
 
-export async function updateTrip(app: FastifyInstance) {
+export async function updateTask(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().put(
-    '/trips/:tripId',
+    '/tasks/:TaskId',
     {
       schema: {
         params: z.object({
-          tripId: z.string().uuid(),
+          TaskId: z.string().uuid(),
         }),
         body: z.object({
           destination: z.string().min(4),
@@ -21,27 +21,27 @@ export async function updateTrip(app: FastifyInstance) {
       },
     },
     async (request) => {
-      const { tripId } = request.params
+      const { TaskId } = request.params
       const { destination, starts_at, ends_at } = request.body
 
-      const trip = await prisma.trip.findUnique({
-        where: { id: tripId }
+      const task = await prisma.task.findUnique({
+        where: { id: TaskId }
       })
 
-      if (!trip) {
-        throw new ClientError('Trip not found')
+      if (!task) {
+        throw new ClientError('Task not found')
       }
 
       if (dayjs(starts_at).isBefore(new Date())) {
-        throw new ClientError('Invalid trip start date.')
+        throw new ClientError('Invalid task start date.')
       }
 
       if (dayjs(ends_at).isBefore(starts_at)) {
-        throw new ClientError('Invalid trip end date.')
+        throw new ClientError('Invalid task end date.')
       }
 
-      await prisma.trip.update({
-        where: { id: tripId },
+      await prisma.task.update({
+        where: { id: TaskId },
         data: {
           destination,
           starts_at,
@@ -49,7 +49,7 @@ export async function updateTrip(app: FastifyInstance) {
         },
       })
 
-      return { tripId: trip.id }
+      return { TaskId: task.id }
     },
   )
 }
